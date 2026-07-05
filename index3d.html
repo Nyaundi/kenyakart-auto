@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KenyaKart Auto | 3D Car Wrap, Tint & PPF Configurator</title>
+<meta name="description" content="Professional car wrapping, window tinting and PPF paint protection in Nairobi, Kenya. A KenyaKart company. Configure your car in 3D.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root{ --brand:#16a34a; --brand-dark:#065f46; --ink:#05070a; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--ink); font-family:'Manrope',sans-serif; color:#e6ece9; }
+  #canvas-wrap{ position:fixed; inset:0; }
+  canvas{ display:block; width:100%; height:100%; }
+
+  .brand-font{ font-family:'Space Grotesk',sans-serif; }
+
+  /* ---------- INTRO ---------- */
+  #intro{ position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; transition:opacity .9s ease, visibility .9s; }
+  #intro.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+  #intro h1{ font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,7vw,5rem); font-weight:700; letter-spacing:.02em; margin:0; color:#fff; text-shadow:0 0 40px rgba(22,163,74,.45); }
+  #intro h1 span{ color:var(--brand); }
+  #intro .tagline{ margin-top:.75rem; letter-spacing:.35em; text-transform:uppercase; font-size:.75rem; color:#9ca3af; }
+  #intro .rule{ width:1px; height:60px; background:linear-gradient(#16a34a,transparent); margin:2rem auto; }
+  #enter-btn{ width:110px; height:110px; border-radius:50%; border:1px solid rgba(22,163,74,.5); background:rgba(22,163,74,.08); color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.95rem; cursor:pointer; backdrop-filter:blur(6px); transition:all .25s ease; }
+  #enter-btn:hover{ background:var(--brand); color:#05070a; box-shadow:0 0 60px rgba(22,163,74,.6); transform:scale(1.05); }
+  #enter-btn:disabled{ opacity:.45; cursor:wait; }
+  #enter-btn:disabled:hover{ background:rgba(22,163,74,.08); color:#fff; box-shadow:none; transform:none; }
+  #perf-toggle{ margin-top:2.5rem; font-size:.75rem; color:#6b7280; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; border:none; background:none; }
+  #perf-toggle b{ color:#9ca3af; }
+  #simple-link{ position:absolute; bottom:22px; right:26px; font-size:.7rem; color:#4b5563; text-decoration:none; letter-spacing:.05em; }
+  #simple-link:hover{ color:var(--brand); }
+
+  /* ---------- TOP NAV (main experience) ---------- */
+  #topnav{ position:fixed; top:0; left:0; right:0; z-index:30; display:flex; align-items:center; justify-content:space-between; padding:20px 28px; opacity:0; transition:opacity .6s ease .3s; pointer-events:none; }
+  #topnav.show{ opacity:1; pointer-events:auto; }
+  #topnav .logo{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.1rem; color:#fff; }
+  #topnav .logo b{ color:var(--brand); }
+  #topnav .cta{ background:var(--brand); color:#05070a; font-weight:700; font-size:.8rem; padding:10px 18px; border-radius:999px; text-decoration:none; }
+
+  /* ---------- HOTSPOTS ---------- */
+  .hotspot{ position:absolute; top:0; left:0; transform:translate(-50%,-50%); z-index:20; display:flex; flex-direction:column; align-items:center; cursor:pointer; opacity:0; transition:opacity .5s ease; }
+  .hotspot.show{ opacity:1; }
+  .hotspot .dot{ width:10px; height:10px; border-radius:50%; background:var(--brand); box-shadow:0 0 0 5px rgba(22,163,74,.18), 0 0 18px rgba(22,163,74,.7); }
+  .hotspot .label{ margin-top:10px; font-family:'Space Grotesk',sans-serif; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:#d1d5db; white-space:nowrap; writing-mode:vertical-rl; }
+  .hotspot:hover .label{ color:var(--brand); }
+
+  /* ---------- SIDE PANEL ---------- */
+  #panel{ position:fixed; top:0; right:0; height:100%; width:min(420px,92vw); background:rgba(6,10,8,.82); backdrop-filter:blur(14px); border-left:1px solid rgba(255,255,255,.08); z-index:50; transform:translateX(100%); transition:transform .45s cubic-bezier(.16,.84,.44,1); overflow-y:auto; padding:32px 28px 40px; }
+  #panel.open{ transform:translateX(0); }
+  #panel h2{ font-family:'Space Grotesk',sans-serif; font-size:1.5rem; color:#fff; margin:.2rem 0 1.4rem; }
+  #panel-close{ position:absolute; top:24px; right:24px; background:none; border:1px solid rgba(255,255,255,.15); color:#fff; width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:1rem; }
+  #panel-close:hover{ border-color:var(--brand); color:var(--brand); }
+  .swatches{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:1.6rem; }
+  .swatch{ width:34px; height:34px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,.25); }
+  .swatch.active{ border-color:var(--brand); box-shadow:0 0 0 3px rgba(22,163,74,.25); }
+  .pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.8rem; }
+  .pill{ padding:8px 14px; border-radius:999px; font-size:.78rem; font-weight:700; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.03); color:#d1d5db; cursor:pointer; }
+  .pill.active{ background:var(--brand); color:#05070a; border-color:var(--brand); }
+  #panel p{ color:#9ca3af; font-size:.9rem; line-height:1.6; }
+  #panel .sub{ color:var(--brand); font-size:.7rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; margin-bottom:.4rem; }
+  #whatsapp-cta{ display:block; text-align:center; margin-top:1.6rem; background:var(--brand); color:#05070a; font-weight:800; padding:14px; border-radius:12px; text-decoration:none; }
+  .about-list li, .gallery-item{ color:#cbd5e1; font-size:.85rem; margin-bottom:.6rem; }
+  .gallery-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:1rem; }
+  .gallery-card{ aspect-ratio:3/4; border-radius:12px; display:flex; align-items:flex-end; padding:10px; font-size:.7rem; font-weight:700; color:#fff; }
+
+  #loading{ position:fixed; inset:0; z-index:60; background:var(--ink); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; }
+  #loading.hidden{ display:none; }
+  .spin{ width:38px; height:38px; border-radius:50%; border:3px solid rgba(22,163,74,.2); border-top-color:var(--brand); animation:spin 1s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  #drag-hint{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:#6b7280; z-index:20; opacity:0; transition:opacity .6s ease 1s; }
+  #drag-hint.show{ opacity:1; }
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spin"></div><div style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#6b7280;">Loading experience</div></div>
+
+<div id="canvas-wrap"><canvas id="scene"></canvas></div>
+
+<!-- INTRO -->
+<div id="intro">
+  <p class="tagline">A KenyaKart Company</p>
+  <h1>Kenya<span>Kart</span> Auto</h1>
+  <p class="tagline" style="margin-top:.5rem;">Car Wrap &middot; Window Tint &middot; PPF Protection</p>
+  <div class="rule"></div>
+  <button id="enter-btn" disabled>LOADING&hellip;</button>
+  <button id="perf-toggle">Performance Mode: <b id="perf-state">High</b></button>
+  <a id="simple-link" href="classic.html">Simple version &rarr;</a>
+</div>
+
+<!-- TOP NAV -->
+<div id="topnav">
+  <div class="logo">KenyaKart <b>Auto</b></div>
+  <a class="cta" href="https://wa.me/254716957176?text=Hi%20KenyaKart%20Auto%2C%20I%27d%20like%20to%20book%20a%20service" target="_blank">Book on WhatsApp</a>
+</div>
+
+<!-- HOTSPOTS -->
+<div id="hotspots"></div>
+<div id="drag-hint">Drag to rotate</div>
+
+<!-- SIDE PANEL -->
+<div id="panel">
+  <button id="panel-close">&#10005;</button>
+  <div id="panel-body"></div>
+</div>
+
+<script>
+/* ============================= DATA ============================= */
+const WRAP_COLORS = [
+  { name:"Gloss Black", hex:0x0a0a0a },
+  { name:"Pearl White", hex:0xf3f4f6 },
+  { name:"KenyaKart Green", hex:0x16a34a },
+  { name:"Matte Graphite", hex:0x3f3f46 },
+  { name:"Racing Red", hex:0xb91c1c },
+  { name:"Ocean Blue", hex:0x1d4ed8 },
+];
+const TINTS = [
+  { pct:"5%",  color:0x030303, opacity:.95 },
+  { pct:"15%", color:0x0a0a0a, opacity:.86 },
+  { pct:"20%", color:0x111318, opacity:.78 },
+  { pct:"35%", color:0x1c222b, opacity:.6 },
+  { pct:"50%", color:0x2a323d, opacity:.42 },
+];
+
+const PANELS = {
+  about: {
+    title: "About Us",
+    html: '<p class="sub">Who We Are</p>' +
+      '<p>KenyaKart Auto brings certified car wrapping, window tinting and PPF paint protection to Nairobi &amp; Kiambu County - built on the same trust as our parent brand, KenyaKart.</p>' +
+      '<ul class="about-list" style="padding-left:18px;margin-top:1rem;">' +
+      '<li>Certified installers, premium film brands</li>' +
+      '<li>Real written warranty on every job</li>' +
+      '<li>M-Pesa &amp; WhatsApp booking</li>' +
+      '<li>Mobile install available across Nairobi</li>' +
+      '</ul>'
+  },
+  gallery: {
+    title: "Gallery",
+    html: '<p class="sub">Recent Work</p>' +
+      '<div class="gallery-grid">' +
+      '<div class="gallery-card" style="background:linear-gradient(135deg,#16a34a,#052e1a)">Matte Wrap<br><span style="font-weight:400;opacity:.7">Sedan</span></div>' +
+      '<div class="gallery-card" style="background:linear-gradient(135deg,#374151,#0b0f14)">20% Tint<br><span style="font-weight:400;opacity:.7">SUV</span></div>' +
+      '<div class="gallery-card" style="background:linear-gradient(135deg,#22c55e,#052e1a)">Gloss PPF<br><span style="font-weight:400;opacity:.7">Bonnet</span></div>' +
+      '<div class="gallery-card" style="background:linear-gradient(135deg,#52525b,#0b0f14)">Chrome Delete<br><span style="font-weight:400;opacity:.7">Pickup</span></div>' +
+      '</div>'
+  },
+  contact: {
+    title: "Contact & Book",
+    html: '<p class="sub">Get In Touch</p>' +
+      '<p>Mon&ndash;Sat, 8am&ndash;6pm EAT &middot; Nairobi &amp; Kiambu County &middot; M-Pesa accepted</p>' +
+      '<a id="whatsapp-cta" href="https://wa.me/254716957176?text=Hi%20KenyaKart%20Auto%2C%20I%27d%20like%20a%20quote" target="_blank">Chat on WhatsApp</a>' +
+      '<p style="margin-top:1.4rem;"><a href="https://kenyakart.co.ke" target="_blank" style="color:#16a34a;">Shop the main KenyaKart store &rarr;</a></p>'
+  }
+};
+
+/* ============================= THREE.JS SETUP ============================= */
+let perfHigh = true;
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x05070a, 0.045);
+
+const camera = new THREE.PerspectiveCamera(42, window.innerWidth/window.innerHeight, 0.1, 200);
+let camRadius = 9.5, camTheta = Math.PI/2, camPhi = 1.15;
+const camTarget = new THREE.Vector3(0, 1.1, 0);
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene'), antialias:true, alpha:false });
+renderer.setClearColor(0x05070a, 1);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+
+scene.add(new THREE.AmbientLight(0x556677, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.1);
+key.position.set(6, 9, 4);
+key.castShadow = true;
+key.shadow.mapSize.set(1024,1024);
+scene.add(key);
+const rim = new THREE.PointLight(0x16a34a, 6, 20);
+rim.position.set(-5, 2.5, -4);
+scene.add(rim);
+const rim2 = new THREE.PointLight(0x2563eb, 3, 18);
+rim2.position.set(5, 1.5, -5);
+scene.add(rim2);
+
+const platform = new THREE.Group();
+const hexGeo = new THREE.CylinderGeometry(4.4, 4.4, 0.18, 6);
+const hexMat = new THREE.MeshStandardMaterial({ color:0x0d1512, metalness:.6, roughness:.35 });
+const hexMesh = new THREE.Mesh(hexGeo, hexMat);
+hexMesh.receiveShadow = true;
+platform.add(hexMesh);
+
+const ringGeo = new THREE.RingGeometry(4.35, 4.55, 6);
+const ringMat = new THREE.MeshBasicMaterial({ color:0x16a34a, side:THREE.DoubleSide, transparent:true, opacity:.85 });
+const ring = new THREE.Mesh(ringGeo, ringMat);
+ring.rotation.x = -Math.PI/2;
+ring.position.y = 0.1;
+platform.add(ring);
+
+const floor = new THREE.Mesh(new THREE.CircleGeometry(30, 48), new THREE.MeshStandardMaterial({ color:0x05070a, metalness:.2, roughness:.9 }));
+floor.rotation.x = -Math.PI/2;
+floor.position.y = -0.09;
+floor.receiveShadow = true;
+scene.add(floor);
+scene.add(platform);
+
+const carGroup = new THREE.Group();
+let bodyMat, glassMat;
+let carReady = false;
+
+const CATEGORY_MATERIAL = {
+  paint: function(){ bodyMat = new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, metalness:.75, roughness:.28, clearcoat:1, clearcoatRoughness:.12 }); return bodyMat; },
+  glass: function(){ glassMat = new THREE.MeshPhysicalMaterial({ color:0x111318, metalness:.2, roughness:.05, transparent:true, opacity:.78, side:THREE.DoubleSide }); return glassMat; },
+  wheel: function(){ return new THREE.MeshStandardMaterial({ color:0xd8d8dc, metalness:.9, roughness:.25 }); },
+  tire: function(){ return new THREE.MeshStandardMaterial({ color:0x0b0b0b, metalness:.1, roughness:.85 }); },
+  trim: function(){ return new THREE.MeshStandardMaterial({ color:0x1c1c1f, metalness:.7, roughness:.4 }); },
+  light_front: function(){ return new THREE.MeshStandardMaterial({ color:0xfff7d6, emissive:0xffe9a8, emissiveIntensity:1.2, metalness:.2, roughness:.2 }); },
+  light_red: function(){ return new THREE.MeshStandardMaterial({ color:0x7f1d1d, emissive:0xb91c1c, emissiveIntensity:1.3 }); },
+};
+
+function buildFallbackCar(){
+  bodyMat = new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, metalness:.75, roughness:.28, clearcoat:1, clearcoatRoughness:.12 });
+  glassMat = new THREE.MeshPhysicalMaterial({ color:0x111318, metalness:.2, roughness:.05, transparent:true, opacity:.78 });
+  const trimMat = new THREE.MeshStandardMaterial({ color:0x18181b, metalness:.9, roughness:.35 });
+  const lightMat = new THREE.MeshStandardMaterial({ color:0xfff7d6, emissive:0xffe9a8, emissiveIntensity:1.4 });
+  const tailMat = new THREE.MeshStandardMaterial({ color:0x7f1d1d, emissive:0xb91c1c, emissiveIntensity:1.1 });
+  const lower = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.62, 1.9), bodyMat);
+  lower.position.y = 0.55; lower.castShadow = true; carGroup.add(lower);
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.62, 1.68), bodyMat);
+  cabin.position.set(-0.15, 1.14, 0); cabin.castShadow = true; carGroup.add(cabin);
+  const glassBand = new THREE.Mesh(new THREE.BoxGeometry(2.56, 0.4, 1.74), glassMat);
+  glassBand.position.set(-0.15, 1.02, 0); carGroup.add(glassBand);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.12, 1.55), bodyMat);
+  roof.position.set(-0.2, 1.5, 0); roof.castShadow = true; carGroup.add(roof);
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.14, 1.8), bodyMat);
+  hood.position.set(1.8, 0.86, 0); carGroup.add(hood);
+  const trunk = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.12, 1.8), bodyMat);
+  trunk.position.set(-2.05, 0.86, 0); carGroup.add(trunk);
+  const bumperF = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 1.95), trimMat);
+  bumperF.position.set(2.28, 0.5, 0); carGroup.add(bumperF);
+  const bumperR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 1.95), trimMat);
+  bumperR.position.set(-2.28, 0.5, 0); carGroup.add(bumperR);
+  [1,-1].forEach(function(s){
+    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.16,0.5), lightMat);
+    hl.position.set(2.33, 0.55, s*0.65); carGroup.add(hl);
+    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.18,0.5), tailMat);
+    tl.position.set(-2.33, 0.6, s*0.65); carGroup.add(tl);
+  });
+  const wheelGeo = new THREE.CylinderGeometry(0.46,0.46,0.34,20);
+  const wheelMat = new THREE.MeshStandardMaterial({ color:0x0b0b0b, metalness:.5, roughness:.6 });
+  const hubMat = new THREE.MeshStandardMaterial({ color:0xd4d4d8, metalness:.9, roughness:.25 });
+  [[1.35,0.72],[1.35,-0.72],[-1.35,0.72],[-1.35,-0.72]].forEach(function(pair){
+    const x=pair[0], z=pair[1];
+    const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+    wheel.rotation.z = Math.PI/2; wheel.position.set(x, 0.46, z); wheel.castShadow = true; carGroup.add(wheel);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.36,16), hubMat);
+    hub.rotation.z = Math.PI/2; hub.position.set(x, 0.46, z); carGroup.add(hub);
+  });
+  carGroup.position.y = 0.09;
+  platform.add(carGroup);
+  carReady = true;
+}
+
+function loadRealCar(){
+  return fetch('car/manifest.json').then(function(r){ if(!r.ok) throw new Error('no manifest'); return r.json(); }).then(function(manifest){
+    const bbox = manifest.bbox;
+    const targetLength = 4.3;
+    const scale = targetLength / bbox.size[2];
+    const center = new THREE.Vector3(bbox.center[0], bbox.center[1], bbox.center[2]);
+
+    let chain = Promise.resolve();
+    manifest.categories.forEach(function(cat){
+      chain = chain.then(function(){
+        return fetch('car/' + cat.file).then(function(r){ if(!r.ok) throw new Error('missing ' + cat.file); return r.arrayBuffer(); }).then(function(buf){
+          const interleaved = new THREE.InterleavedBuffer(new Float32Array(buf), 6);
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.InterleavedBufferAttribute(interleaved, 3, 0));
+          geo.setAttribute('normal', new THREE.InterleavedBufferAttribute(interleaved, 3, 3));
+          const matFactory = CATEGORY_MATERIAL[cat.name] || function(){ return new THREE.MeshStandardMaterial({ color:0x555555 }); };
+          const material = matFactory();
+          const mesh = new THREE.Mesh(geo, material);
+          mesh.castShadow = true;
+          mesh.receiveShadow = false;
+          carGroup.add(mesh);
+        });
+      });
+    });
+
+    return chain.then(function(){
+      carGroup.children.forEach(function(m){ m.position.sub(center); });
+      carGroup.scale.setScalar(scale);
+      carGroup.rotation.y = Math.PI / 2;
+      const lowestLocalY = (bbox.min[1] - bbox.center[1]) * scale;
+      carGroup.position.y = 0.09 - lowestLocalY;
+      platform.add(carGroup);
+      carReady = true;
+    });
+  });
+}
+
+loadRealCar().catch(function(err){
+  console.warn('Falling back to stylised car:', err);
+  buildFallbackCar();
+});
+
+function buildParticles(count){
+  const positions = new Float32Array(count*3);
+  for(let i=0;i<count;i++){
+    const r = 18 + Math.random()*22;
+    const theta = Math.random()*Math.PI*2;
+    const y = (Math.random()-0.5)*14;
+    positions[i*3] = Math.cos(theta)*r;
+    positions[i*3+1] = y+3;
+    positions[i*3+2] = Math.sin(theta)*r;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  const mat = new THREE.PointsMaterial({ color:0x16a34a, size:.05, transparent:true, opacity:.55 });
+  return new THREE.Points(geo, mat);
+}
+let particles = buildParticles(500);
+scene.add(particles);
+
+function updateCamera(){
+  const x = camTarget.x + camRadius * Math.sin(camPhi) * Math.cos(camTheta);
+  const y = camTarget.y + camRadius * Math.cos(camPhi);
+  const z = camTarget.z + camRadius * Math.sin(camPhi) * Math.sin(camTheta);
+  camera.position.set(x,y,z);
+  camera.lookAt(camTarget);
+}
+camPhi = 1.2; camTheta = 1.55; camRadius = 15;
+updateCamera();
+
+let dragging=false, lastX=0, lastY=0, autoRotate=true;
+const canvasEl = renderer.domElement;
+function onDown(x,y){ dragging=true; lastX=x; lastY=y; autoRotate=false; }
+function onMove(x,y){
+  if(!dragging) return;
+  const dx=(x-lastX)*0.0045, dy=(y-lastY)*0.0035;
+  camTheta -= dx; camPhi = Math.max(0.65, Math.min(1.45, camPhi - dy));
+  lastX=x; lastY=y;
+}
+function onUp(){ dragging=false; }
+canvasEl.addEventListener('mousedown', function(e){ onDown(e.clientX,e.clientY); });
+window.addEventListener('mousemove', function(e){ onMove(e.clientX,e.clientY); });
+window.addEventListener('mouseup', onUp);
+canvasEl.addEventListener('touchstart', function(e){ onDown(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+window.addEventListener('touchmove', function(e){ if(dragging) onMove(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+window.addEventListener('touchend', onUp);
+canvasEl.addEventListener('wheel', function(e){ camRadius = Math.max(6, Math.min(20, camRadius + e.deltaY*0.01)); }, {passive:true});
+
+const hotspotDefs = [
+  { key:'about',   pos:new THREE.Vector3(-2.6, 1.6, 1.6), label:'About Us' },
+  { key:'order',   pos:new THREE.Vector3(1.0, 1.9, -1.7),  label:'Order' },
+  { key:'gallery', pos:new THREE.Vector3(2.8, 1.2, 1.6),  label:'Gallery' },
+  { key:'contact', pos:new THREE.Vector3(-1.0, 1.2, -1.9), label:'Contact' },
+];
+const hotspotContainer = document.getElementById('hotspots');
+const hotspotEls = hotspotDefs.map(function(def){
+  const el = document.createElement('div');
+  el.className='hotspot';
+  el.innerHTML = '<div class="dot"></div><div class="label">' + def.label + '</div>';
+  el.addEventListener('click', function(){ openPanel(def.key); });
+  hotspotContainer.appendChild(el);
+  return el;
+});
+const projVec = new THREE.Vector3();
+function updateHotspots(){
+  hotspotDefs.forEach(function(def, i){
+    projVec.copy(def.pos).applyMatrix4(carGroup.matrixWorld);
+    projVec.project(camera);
+    const x = (projVec.x*0.5+0.5)*window.innerWidth;
+    const y = (-projVec.y*0.5+0.5)*window.innerHeight;
+    hotspotEls[i].style.left = x+'px';
+    hotspotEls[i].style.top = y+'px';
+  });
+}
+
+let selectedColor = WRAP_COLORS[0];
+let selectedTint = TINTS[1];
+
+function orderPanelHTML(){
+  const swatches = WRAP_COLORS.map(function(c,i){
+    return '<div class="swatch ' + (c===selectedColor?'active':'') + '" data-idx="' + i + '" style="background:#' + c.hex.toString(16).padStart(6,'0') + '"></div>';
+  }).join('');
+  const pills = TINTS.map(function(t,i){
+    return '<div class="pill ' + (t===selectedTint?'active':'') + '" data-idx="' + i + '">' + t.pct + '</div>';
+  }).join('');
+  return '<p class="sub">Configure Your Wrap</p><div class="swatches">' + swatches + '</div>' +
+    '<p class="sub">Window Tint %</p><div class="pill-row">' + pills + '</div>' +
+    '<p>Drag the car to see your build from every angle. Prices and installation same-day, subject to vehicle size.</p>' +
+    '<a id="whatsapp-cta" href="#" target="_blank">Book This Exact Build</a>';
+}
+function refreshWhatsAppLink(){
+  const el = document.getElementById('whatsapp-cta');
+  if(!el) return;
+  const msg = encodeURIComponent("Hi KenyaKart Auto, I'd like to book: " + selectedColor.name + " wrap with " + selectedTint.pct + " window tint.");
+  el.href = 'https://wa.me/254716957176?text=' + msg;
+}
+function wireOrderPanel(){
+  document.querySelectorAll('.swatch').forEach(function(s){
+    s.addEventListener('click', function(){
+      selectedColor = WRAP_COLORS[+s.dataset.idx];
+      bodyMat.color.setHex(selectedColor.hex);
+      document.querySelectorAll('.swatch').forEach(function(x){ x.classList.remove('active'); });
+      s.classList.add('active');
+      refreshWhatsAppLink();
+    });
+  });
+  document.querySelectorAll('.pill').forEach(function(pl){
+    pl.addEventListener('click', function(){
+      selectedTint = TINTS[+pl.dataset.idx];
+      glassMat.color.setHex(selectedTint.color);
+      glassMat.opacity = selectedTint.opacity;
+      document.querySelectorAll('.pill').forEach(function(x){ x.classList.remove('active'); });
+      pl.classList.add('active');
+      refreshWhatsAppLink();
+    });
+  });
+  refreshWhatsAppLink();
+}
+
+const panelEl = document.getElementById('panel');
+const panelBody = document.getElementById('panel-body');
+function openPanel(key){
+  if(key==='order'){
+    panelBody.innerHTML = '<h2>Order Your Build</h2>' + orderPanelHTML();
+    wireOrderPanel();
+  } else {
+    const p = PANELS[key];
+    panelBody.innerHTML = '<h2>' + p.title + '</h2>' + p.html;
+  }
+  panelEl.classList.add('open');
+}
+document.getElementById('panel-close').addEventListener('click', function(){ panelEl.classList.remove('open'); });
+
+document.getElementById('loading').classList.add('hidden');
+const introEl = document.getElementById('intro');
+const topnavEl = document.getElementById('topnav');
+const dragHintEl = document.getElementById('drag-hint');
+
+const enterBtnEl = document.getElementById('enter-btn');
+(function pollReady(){
+  if(carReady){ enterBtnEl.disabled = false; enterBtnEl.textContent = 'ENTER'; return; }
+  setTimeout(pollReady, 100);
+})();
+
+enterBtnEl.addEventListener('click', function(){
+  if(enterBtnEl.disabled) return;
+  introEl.classList.add('hidden');
+  topnavEl.classList.add('show');
+  dragHintEl.classList.add('show');
+  hotspotEls.forEach(function(el){ el.classList.add('show'); });
+  const startRadius = camRadius, startPhi = camPhi;
+  const targetRadius = 9.5, targetPhi = 1.18;
+  const t0 = performance.now();
+  function fly(){
+    const t = Math.min(1, (performance.now()-t0)/1400);
+    const ease = 1-Math.pow(1-t,3);
+    camRadius = startRadius + (targetRadius-startRadius)*ease;
+    camPhi = startPhi + (targetPhi-startPhi)*ease;
+    if(t<1) requestAnimationFrame(fly);
+  }
+  fly();
+});
+
+let perfState = document.getElementById('perf-state');
+document.getElementById('perf-toggle').addEventListener('click', function(){
+  perfHigh = !perfHigh;
+  perfState.textContent = perfHigh ? 'High' : 'Standard';
+  scene.remove(particles);
+  particles = buildParticles(perfHigh ? 500 : 150);
+  scene.add(particles);
+  renderer.setPixelRatio(perfHigh ? Math.min(window.devicePixelRatio,1.75) : 1);
+  renderer.shadowMap.enabled = perfHigh;
+});
+
+window.addEventListener('resize', function(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  if(autoRotate) camTheta += 0.0016;
+  particles.rotation.y += 0.0007;
+  updateCamera();
+  updateHotspots();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

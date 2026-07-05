@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KenyaKart Auto | Car Wrapping, Window Tinting & PPF Protection — Nairobi</title>
+<meta name="description" content="Professional car wrapping, window tinting and PPF paint protection in Nairobi, Kenya. A KenyaKart company.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { DEFAULT: '#16a34a', dark: '#065f46' },
+          ink: '#0b0f0d'
+        },
+        fontFamily: {
+          sans: ['Manrope','sans-serif'],
+          display: ['Space Grotesk','sans-serif']
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { background:#0b0f0d; }
+  .grain::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%, rgba(22,163,74,.25), transparent 40%), radial-gradient(circle at 80% 0%, rgba(22,163,74,.15), transparent 35%);}
+  .card-glow{ transition: transform .25s ease, box-shadow .25s ease; }
+  .card-glow:hover{ transform: translateY(-6px); box-shadow: 0 20px 40px -15px rgba(22,163,74,.35); }
+  .ba-wrap{ position:relative; overflow:hidden; border-radius:1rem; }
+  .ba-after{ position:absolute; inset:0; clip-path: inset(0 50% 0 0); transition: clip-path .1s linear; }
+  .ba-handle{ position:absolute; top:0; bottom:0; left:50%; width:3px; background:#16a34a; cursor:ew-resize; }
+  .ba-handle::after{ content:"⇔"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#16a34a; color:#0b0f0d; font-weight:800; width:34px; height:34px; border-radius:9999px; display:flex; align-items:center; justify-content:center; }
+  .fade-up{ animation: fadeUp .7s ease both; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)} }
+</style>
+</head>
+<body class="font-sans text-slate-200 antialiased">
+
+<!-- NAV -->
+<header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-ink/70 border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2 font-display font-bold text-lg text-white">
+      <span class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-ink font-black">K</span>
+      KenyaKart <span class="text-brand">Auto</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+      <a href="#services" class="hover:text-white transition">Services</a>
+      <a href="#gallery" class="hover:text-white transition">Gallery</a>
+      <a href="#why" class="hover:text-white transition">Why Us</a>
+      <a href="#contact" class="hover:text-white transition">Contact</a>
+    </nav>
+    <a href="https://wa.me/254716957176?text=Hi%20KenyaKart%20Auto%2C%20I%27d%20like%20to%20book%20a%20service" target="_blank"
+       class="inline-flex items-center gap-2 bg-brand text-ink font-bold text-sm px-4 py-2 rounded-full hover:bg-white transition">
+      Book on WhatsApp
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="top" class="relative pt-32 pb-24 px-5 sm:px-8 overflow-hidden grain">
+  <div class="max-w-7xl mx-auto relative grid lg:grid-cols-2 gap-14 items-center">
+    <div class="fade-up">
+      <p class="inline-block text-xs font-bold tracking-widest uppercase text-brand bg-brand/10 border border-brand/30 rounded-full px-3 py-1 mb-6">A KenyaKart Company · Nairobi, Kenya</p>
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.05] mb-6">
+        Transform Your Ride.<br><span class="text-brand">Protect What Matters.</span>
+      </h1>
+      <p class="text-slate-400 text-lg mb-8 max-w-xl">
+        Premium car wrapping, window tinting and PPF paint protection — built for Nairobi roads,
+        Nairobi weather, and Nairobi standards. Same-day booking, certified installers, real warranty.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="https://wa.me/254716957176" target="_blank" class="bg-brand text-ink font-bold px-6 py-3.5 rounded-full hover:bg-white transition">Book a Slot on WhatsApp</a>
+        <a href="#services" class="border border-white/20 text-white font-bold px-6 py-3.5 rounded-full hover:border-brand hover:text-brand transition">View Services</a>
+      </div>
+      <div class="flex gap-8 mt-10 text-sm">
+        <div><p class="text-2xl font-display font-bold text-white">3–7 yrs</p><p class="text-slate-500">Film warranty</p></div>
+        <div><p class="text-2xl font-display font-bold text-white">Same-day</p><p class="text-slate-500">Most bookings</p></div>
+        <div><p class="text-2xl font-display font-bold text-white">M-Pesa</p><p class="text-slate-500">& card accepted</p></div>
+      </div>
+    </div>
+    <div class="fade-up" style="animation-delay:.15s">
+      <div class="ba-wrap aspect-[4/3] shadow-2xl border border-white/10">
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-slate-500 font-display text-sm tracking-widest">BEFORE — FACTORY PAINT</div>
+        <div class="ba-after bg-gradient-to-br from-brand-dark to-emerald-500 flex items-center justify-center text-emerald-950 font-display text-sm tracking-widest font-bold">AFTER — GLOSS WRAP + PPF</div>
+        <div class="ba-handle" id="baHandle"></div>
+      </div>
+      <p class="text-center text-xs text-slate-500 mt-3">Drag the slider — before / after example</p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="py-24 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-7xl mx-auto">
+    <div class="max-w-2xl mb-14">
+      <p class="text-brand font-bold text-sm uppercase tracking-widest mb-3">What We Do</p>
+      <h2 class="font-display text-3xl sm:text-4xl font-bold text-white">Three services. One standard: flawless.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="card-glow bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+        <div class="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mb-6 text-brand text-xl">🎨</div>
+        <h3 class="font-display text-xl font-bold text-white mb-3">Car Wrapping</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Full colour-change wraps, chrome delete, custom liveries and matte/satin/gloss finishes — reversible, and it protects your factory paint underneath.</p>
+      </div>
+      <div class="card-glow bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+        <div class="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mb-6 text-brand text-xl">🪟</div>
+        <h3 class="font-display text-xl font-bold text-white mb-3">Window Tinting</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Heat-rejecting, UV-blocking film in legal-compliant shades. Keeps the cabin cooler on Nairobi afternoons and protects your interior from fading.</p>
+      </div>
+      <div class="card-glow bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+        <div class="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mb-6 text-brand text-xl">🛡️</div>
+        <h3 class="font-display text-xl font-bold text-white mb-3">PPF Protection</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Self-healing paint protection film on high-impact areas — bonnet, bumper, mirrors — against chips, scratches and Nairobi's murram roads.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why" class="py-24 px-5 sm:px-8 border-t border-white/5 bg-white/[0.02]">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <div>
+      <p class="text-brand font-bold text-sm uppercase tracking-widest mb-3">Why KenyaKart Auto</p>
+      <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-8">Built on the same trust as KenyaKart.</h2>
+      <div class="space-y-6">
+        <div class="flex gap-4"><span class="text-brand font-display font-bold">01</span><p class="text-slate-400"><span class="text-white font-semibold">Certified installers</span> trained on premium film brands, not backstreet guesswork.</p></div>
+        <div class="flex gap-4"><span class="text-brand font-display font-bold">02</span><p class="text-slate-400"><span class="text-white font-semibold">Real warranty</span> on every film and wrap — in writing, not a promise.</p></div>
+        <div class="flex gap-4"><span class="text-brand font-display font-bold">03</span><p class="text-slate-400"><span class="text-white font-semibold">M-Pesa & WhatsApp booking</span> — the same easy checkout you already trust from KenyaKart.</p></div>
+        <div class="flex gap-4"><span class="text-brand font-display font-bold">04</span><p class="text-slate-400"><span class="text-white font-semibold">Mobile install available</span> — we can come to your estate or office car park in Nairobi & Kiambu.</p></div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-gradient-to-br from-brand/20 to-transparent border border-brand/20 rounded-2xl p-6 aspect-square flex flex-col justify-end"><p class="font-display text-3xl font-bold text-white">500+</p><p class="text-slate-400 text-sm">Vehicles wrapped & tinted</p></div>
+      <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-6 aspect-square flex flex-col justify-end mt-8"><p class="font-display text-3xl font-bold text-white">4.8★</p><p class="text-slate-400 text-sm">Average customer rating</p></div>
+      <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-6 aspect-square flex flex-col justify-end"><p class="font-display text-3xl font-bold text-white">7-day</p><p class="text-slate-400 text-sm">Post-install support</p></div>
+      <div class="bg-gradient-to-br from-brand/20 to-transparent border border-brand/20 rounded-2xl p-6 aspect-square flex flex-col justify-end mt-8"><p class="font-display text-3xl font-bold text-white">Nairobi</p><p class="text-slate-400 text-sm">& Kiambu County</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="py-24 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-7xl mx-auto">
+    <p class="text-brand font-bold text-sm uppercase tracking-widest mb-3">Recent Work</p>
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-12">A few finishes we're proud of.</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="card-glow rounded-2xl aspect-[3/4] bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-end p-5"><p class="font-display font-bold text-white">Matte Wrap<br><span class="text-emerald-200 text-xs font-normal">Sedan · full body</span></p></div>
+      <div class="card-glow rounded-2xl aspect-[3/4] bg-gradient-to-br from-slate-600 to-slate-900 flex items-end p-5"><p class="font-display font-bold text-white">20% Tint<br><span class="text-slate-300 text-xs font-normal">SUV · all-round</span></p></div>
+      <div class="card-glow rounded-2xl aspect-[3/4] bg-gradient-to-br from-green-500 to-emerald-950 flex items-end p-5"><p class="font-display font-bold text-white">Gloss PPF<br><span class="text-green-100 text-xs font-normal">Bonnet & bumper</span></p></div>
+      <div class="card-glow rounded-2xl aspect-[3/4] bg-gradient-to-br from-zinc-600 to-zinc-900 flex items-end p-5"><p class="font-display font-bold text-white">Chrome Delete<br><span class="text-zinc-300 text-xs font-normal">Pickup · trims</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-24 px-5 sm:px-8 border-t border-white/5 bg-white/[0.02]">
+  <div class="max-w-7xl mx-auto">
+    <p class="text-brand font-bold text-sm uppercase tracking-widest mb-3 text-center">Sample Feedback</p>
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-14 text-center">What early customers say.</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+        <p class="text-slate-300 mb-6">"Booked on WhatsApp in the morning, car was done by evening. The wrap still looks brand new."</p>
+        <p class="font-display font-bold text-white text-sm">— Wanjiru K., Nairobi</p>
+      </div>
+      <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+        <p class="text-slate-300 mb-6">"Tint quality is night and day compared to the guy I used before. Cabin is noticeably cooler."</p>
+        <p class="font-display font-bold text-white text-sm">— Otieno M., Kiambu</p>
+      </div>
+      <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+        <p class="text-slate-300 mb-6">"PPF on the bonnet has already saved me from two stone chips on Thika Road. Worth it."</p>
+        <p class="font-display font-bold text-white text-sm">— Achieng' D., Nairobi</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="py-24 px-5 sm:px-8 border-t border-white/5">
+  <div class="max-w-5xl mx-auto text-center">
+    <p class="text-brand font-bold text-sm uppercase tracking-widest mb-3">Book Your Slot</p>
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-6">Ready to give your car the KenyaKart finish?</h2>
+    <p class="text-slate-400 mb-10 max-w-xl mx-auto">Message us on WhatsApp with your car model and what you'd like done — wrap, tint, PPF, or all three. We'll send you a quote same day.</p>
+    <a href="https://wa.me/254716957176?text=Hi%20KenyaKart%20Auto%2C%20I%27d%20like%20a%20quote%20for%20my%20car" target="_blank"
+       class="inline-flex items-center gap-3 bg-brand text-ink font-bold px-8 py-4 rounded-full hover:bg-white transition text-lg">
+      💬 Chat With Us on WhatsApp
+    </a>
+    <p class="text-slate-600 text-sm mt-6">Mon–Sat, 8am–6pm EAT · Nairobi & Kiambu County · M-Pesa accepted</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-10 px-5 sm:px-8">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+    <p>© 2026 KenyaKart Auto — a KenyaKart company. All rights reserved.</p>
+    <a href="https://kenyakart.co.ke" target="_blank" class="hover:text-brand transition">Shop electronics, fashion & home essentials at KenyaKart.co.ke →</a>
+  </div>
+</footer>
+
+<script>
+  const handle = document.getElementById('baHandle');
+  const after = document.querySelector('.ba-after');
+  const wrap = document.querySelector('.ba-wrap');
+  let dragging = false;
+  function move(x){
+    const rect = wrap.getBoundingClientRect();
+    let pct = ((x - rect.left) / rect.width) * 100;
+    pct = Math.max(0, Math.min(100, pct));
+    after.style.clipPath = `inset(0 ${100-pct}% 0 0)`;
+    handle.style.left = pct + '%';
+  }
+  handle.addEventListener('mousedown', () => dragging = true);
+  window.addEventListener('mouseup', () => dragging = false);
+  window.addEventListener('mousemove', e => dragging && move(e.clientX));
+  handle.addEventListener('touchstart', () => dragging = true);
+  window.addEventListener('touchend', () => dragging = false);
+  window.addEventListener('touchmove', e => dragging && move(e.touches[0].clientX));
+</script>
+</body>
+</html>

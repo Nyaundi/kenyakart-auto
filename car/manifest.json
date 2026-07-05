@@ -1,0 +1,68 @@
+{
+  "categories": [
+    {
+      "name": "wheel",
+      "file": "wheel.bin",
+      "vertexCount": 133248,
+      "byteLength": 3197952
+    },
+    {
+      "name": "trim",
+      "file": "trim.bin",
+      "vertexCount": 9702,
+      "byteLength": 232848
+    },
+    {
+      "name": "light_front",
+      "file": "light_front.bin",
+      "vertexCount": 9696,
+      "byteLength": 232704
+    },
+    {
+      "name": "light_red",
+      "file": "light_red.bin",
+      "vertexCount": 18,
+      "byteLength": 432
+    },
+    {
+      "name": "glass",
+      "file": "glass.bin",
+      "vertexCount": 1530,
+      "byteLength": 36720
+    },
+    {
+      "name": "paint",
+      "file": "paint.bin",
+      "vertexCount": 15513,
+      "byteLength": 372312
+    },
+    {
+      "name": "tire",
+      "file": "tire.bin",
+      "vertexCount": 11268,
+      "byteLength": 270432
+    }
+  ],
+  "bbox": {
+    "min": [
+      -1.9507369995117188,
+      -0.007946907542645931,
+      -4.7393341064453125
+    ],
+    "max": [
+      2.109407901763916,
+      2.5654172897338867,
+      4.385778903961182
+    ],
+    "center": [
+      0.07933545112609863,
+      1.2787351608276367,
+      -0.17677760124206543
+    ],
+    "size": [
+      4.060144901275635,
+      2.5733642578125,
+      9.125112533569336
+    ]
+  }
+}
