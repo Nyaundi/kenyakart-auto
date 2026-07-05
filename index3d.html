@@ -30,8 +30,14 @@
   #enter-btn:disabled:hover{ background:rgba(22,163,74,.08); color:#fff; box-shadow:none; transform:none; }
   #perf-toggle{ margin-top:2.5rem; font-size:.75rem; color:#6b7280; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; border:none; background:none; }
   #perf-toggle b{ color:#9ca3af; }
-  #simple-link{ position:absolute; bottom:22px; right:26px; font-size:.7rem; color:#4b5563; text-decoration:none; letter-spacing:.05em; }
-  #simple-link:hover{ color:var(--brand); }
+  #simple-link{ position:absolute; bottom:26px; right:26px; font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#d1d5db; text-decoration:none; border:1px solid rgba(255,255,255,.25); padding:10px 16px; border-radius:999px; backdrop-filter:blur(6px); transition:all .2s ease; }
+  #simple-link:hover{ color:#05070a; background:var(--brand); border-color:var(--brand); }
+  #topnav .classic-btn{ font-size:.75rem; font-weight:700; color:#d1d5db; text-decoration:none; letter-spacing:.05em; border:1px solid rgba(255,255,255,.2); padding:9px 16px; border-radius:999px; margin-right:10px; transition:all .2s ease; }
+  #topnav .classic-btn:hover{ color:#05070a; background:#fff; border-color:#fff; }
+  #topnav .nav-right{ display:flex; align-items:center; }
+  .finish-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.8rem; }
+  .finish-pill{ padding:8px 14px; border-radius:999px; font-size:.75rem; font-weight:700; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.03); color:#d1d5db; cursor:pointer; }
+  .finish-pill.active{ background:#fff; color:#05070a; border-color:#fff; }
 
   /* ---------- TOP NAV (main experience) ---------- */
   #topnav{ position:fixed; top:0; left:0; right:0; z-index:30; display:flex; align-items:center; justify-content:space-between; padding:20px 28px; opacity:0; transition:opacity .6s ease .3s; pointer-events:none; }
@@ -89,13 +95,16 @@
   <div class="rule"></div>
   <button id="enter-btn" disabled>LOADING&hellip;</button>
   <button id="perf-toggle">Performance Mode: <b id="perf-state">High</b></button>
-  <a id="simple-link" href="classic.html">Simple version &rarr;</a>
+  <a id="simple-link" href="classic.html">View Classic Site &rarr;</a>
 </div>
 
 <!-- TOP NAV -->
 <div id="topnav">
   <div class="logo">KenyaKart <b>Auto</b></div>
-  <a class="cta" href="https://wa.me/254716957176?text=Hi%20KenyaKart%20Auto%2C%20I%27d%20like%20to%20book%20a%20service" target="_blank">Book on WhatsApp</a>
+  <div class="nav-right">
+    <a class="classic-btn" href="classic.html">Classic Site</a>
+    <a class="cta" href="https://wa.me/254716957176?text=Hi%20KenyaKart%20Auto%2C%20I%27d%20like%20to%20book%20a%20service" target="_blank">Book on WhatsApp</a>
+  </div>
 </div>
 
 <!-- HOTSPOTS -->
@@ -124,6 +133,14 @@ const TINTS = [
   { pct:"20%", color:0x111318, opacity:.78 },
   { pct:"35%", color:0x1c222b, opacity:.6 },
   { pct:"50%", color:0x2a323d, opacity:.42 },
+];
+// Real vinyl wrap shops sell finish (gloss/matte/satin/chrome), not printed patterns -
+// simulate each finish with PBR properties instead of an image texture (no UV pipeline needed).
+const FINISHES = [
+  { name:"Gloss",  metalness:.35, roughness:.28, clearcoat:1,   clearcoatRoughness:.12 },
+  { name:"Matte",  metalness:.25, roughness:.75, clearcoat:.15, clearcoatRoughness:.6  },
+  { name:"Satin",  metalness:.3,  roughness:.5,  clearcoat:.5,  clearcoatRoughness:.35 },
+  { name:"Chrome", metalness:.9,  roughness:.08, clearcoat:1,   clearcoatRoughness:.05 },
 ];
 
 const PANELS = {
@@ -404,15 +421,20 @@ function updateHotspots(){
 
 let selectedColor = WRAP_COLORS[0];
 let selectedTint = TINTS[1];
+let selectedFinish = FINISHES[0];
 
 function orderPanelHTML(){
   const swatches = WRAP_COLORS.map(function(c,i){
     return '<div class="swatch ' + (c===selectedColor?'active':'') + '" data-idx="' + i + '" style="background:#' + c.hex.toString(16).padStart(6,'0') + '"></div>';
   }).join('');
+  const finishes = FINISHES.map(function(f,i){
+    return '<div class="finish-pill ' + (f===selectedFinish?'active':'') + '" data-idx="' + i + '">' + f.name + '</div>';
+  }).join('');
   const pills = TINTS.map(function(t,i){
     return '<div class="pill ' + (t===selectedTint?'active':'') + '" data-idx="' + i + '">' + t.pct + '</div>';
   }).join('');
   return '<p class="sub">Configure Your Wrap</p><div class="swatches">' + swatches + '</div>' +
+    '<p class="sub">Finish</p><div class="finish-row">' + finishes + '</div>' +
     '<p class="sub">Window Tint %</p><div class="pill-row">' + pills + '</div>' +
     '<p>Drag the car to see your build from every angle. Prices and installation same-day, subject to vehicle size.</p>' +
     '<a id="whatsapp-cta" href="#" target="_blank">Book This Exact Build</a>';
@@ -420,7 +442,7 @@ function orderPanelHTML(){
 function refreshWhatsAppLink(){
   const el = document.getElementById('whatsapp-cta');
   if(!el) return;
-  const msg = encodeURIComponent("Hi KenyaKart Auto, I'd like to book: " + selectedColor.name + " wrap with " + selectedTint.pct + " window tint.");
+  const msg = encodeURIComponent("Hi KenyaKart Auto, I'd like to book: " + selectedFinish.name + " " + selectedColor.name + " wrap with " + selectedTint.pct + " window tint.");
   el.href = 'https://wa.me/254716957176?text=' + msg;
 }
 function wireOrderPanel(){
@@ -430,6 +452,19 @@ function wireOrderPanel(){
       bodyMat.color.setHex(selectedColor.hex);
       document.querySelectorAll('.swatch').forEach(function(x){ x.classList.remove('active'); });
       s.classList.add('active');
+      refreshWhatsAppLink();
+    });
+  });
+  document.querySelectorAll('.finish-pill').forEach(function(fp){
+    fp.addEventListener('click', function(){
+      selectedFinish = FINISHES[+fp.dataset.idx];
+      bodyMat.metalness = selectedFinish.metalness;
+      bodyMat.roughness = selectedFinish.roughness;
+      bodyMat.clearcoat = selectedFinish.clearcoat;
+      bodyMat.clearcoatRoughness = selectedFinish.clearcoatRoughness;
+      bodyMat.needsUpdate = true;
+      document.querySelectorAll('.finish-pill').forEach(function(x){ x.classList.remove('active'); });
+      fp.classList.add('active');
       refreshWhatsAppLink();
     });
   });
