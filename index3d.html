@@ -172,18 +172,42 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
-scene.add(new THREE.AmbientLight(0x556677, 0.55));
-const key = new THREE.DirectionalLight(0xffffff, 1.1);
+scene.add(new THREE.HemisphereLight(0xbfd6ff, 0x0a0a0a, 0.9));
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
 key.position.set(6, 9, 4);
 key.castShadow = true;
 key.shadow.mapSize.set(1024,1024);
 scene.add(key);
-const rim = new THREE.PointLight(0x16a34a, 6, 20);
-rim.position.set(-5, 2.5, -4);
+const fill = new THREE.DirectionalLight(0xffffff, 0.7);
+fill.position.set(-6, 5, -3);
+scene.add(fill);
+const rim = new THREE.PointLight(0x16a34a, 1.2, 14);
+rim.position.set(-4, 1.8, -3.5);
 scene.add(rim);
-const rim2 = new THREE.PointLight(0x2563eb, 3, 18);
-rim2.position.set(5, 1.5, -5);
+const rim2 = new THREE.PointLight(0x2563eb, 0.6, 12);
+rim2.position.set(4, 1.2, -4);
 scene.add(rim2);
+
+// simple fake environment so metallic paint/wheels reflect something instead of rendering black
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envScene = new THREE.Scene();
+const envGeo = new THREE.SphereGeometry(20, 16, 16);
+const envMat = new THREE.MeshBasicMaterial({ side: THREE.BackSide });
+const envCanvas = document.createElement('canvas');
+envCanvas.width = 2; envCanvas.height = 256;
+const ectx = envCanvas.getContext('2d');
+const grad = ectx.createLinearGradient(0,0,0,256);
+grad.addColorStop(0, '#dfe9f5');
+grad.addColorStop(0.5, '#1c2b26');
+grad.addColorStop(1, '#05070a');
+ectx.fillStyle = grad; ectx.fillRect(0,0,2,256);
+const envTex = new THREE.CanvasTexture(envCanvas);
+envMat.map = envTex;
+envScene.add(new THREE.Mesh(envGeo, envMat));
+const envRT = pmrem.fromScene(envScene, 0.04);
+scene.environment = envRT.texture;
+pmrem.dispose();
 
 const platform = new THREE.Group();
 const hexGeo = new THREE.CylinderGeometry(4.4, 4.4, 0.18, 6);
@@ -211,11 +235,11 @@ let bodyMat, glassMat;
 let carReady = false;
 
 const CATEGORY_MATERIAL = {
-  paint: function(){ bodyMat = new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, metalness:.75, roughness:.28, clearcoat:1, clearcoatRoughness:.12 }); return bodyMat; },
-  glass: function(){ glassMat = new THREE.MeshPhysicalMaterial({ color:0x111318, metalness:.2, roughness:.05, transparent:true, opacity:.78, side:THREE.DoubleSide }); return glassMat; },
-  wheel: function(){ return new THREE.MeshStandardMaterial({ color:0xd8d8dc, metalness:.9, roughness:.25 }); },
+  paint: function(){ bodyMat = new THREE.MeshPhysicalMaterial({ color:0x2a2a2a, metalness:.35, roughness:.32, clearcoat:1, clearcoatRoughness:.15, envMapIntensity:1.1 }); return bodyMat; },
+  glass: function(){ glassMat = new THREE.MeshPhysicalMaterial({ color:0x1a2229, metalness:.1, roughness:.08, transparent:true, opacity:.72, side:THREE.DoubleSide, envMapIntensity:1.2 }); return glassMat; },
+  wheel: function(){ return new THREE.MeshStandardMaterial({ color:0xb9bcc2, metalness:.6, roughness:.4, envMapIntensity:1 }); },
   tire: function(){ return new THREE.MeshStandardMaterial({ color:0x0b0b0b, metalness:.1, roughness:.85 }); },
-  trim: function(){ return new THREE.MeshStandardMaterial({ color:0x1c1c1f, metalness:.7, roughness:.4 }); },
+  trim: function(){ return new THREE.MeshStandardMaterial({ color:0x2a2a2d, metalness:.5, roughness:.5 }); },
   light_front: function(){ return new THREE.MeshStandardMaterial({ color:0xfff7d6, emissive:0xffe9a8, emissiveIntensity:1.2, metalness:.2, roughness:.2 }); },
   light_red: function(){ return new THREE.MeshStandardMaterial({ color:0x7f1d1d, emissive:0xb91c1c, emissiveIntensity:1.3 }); },
 };
