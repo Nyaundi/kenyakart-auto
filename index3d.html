@@ -70,7 +70,8 @@
   #whatsapp-cta{ display:block; text-align:center; margin-top:1.6rem; background:var(--brand); color:#05070a; font-weight:800; padding:14px; border-radius:12px; text-decoration:none; }
   .about-list li, .gallery-item{ color:#cbd5e1; font-size:.85rem; margin-bottom:.6rem; }
   .gallery-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:1rem; }
-  .gallery-card{ aspect-ratio:3/4; border-radius:12px; display:flex; align-items:flex-end; padding:10px; font-size:.7rem; font-weight:700; color:#fff; }
+  .gallery-card{ aspect-ratio:3/4; border-radius:12px; display:flex; align-items:flex-end; padding:10px; font-size:.7rem; font-weight:700; color:#fff; background-size:cover; background-position:center; }
+  .gallery-card .tag{ background:rgba(0,0,0,.45); backdrop-filter:blur(3px); padding:4px 8px; border-radius:6px; }
 
   #loading{ position:fixed; inset:0; z-index:60; background:var(--ink); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; }
   #loading.hidden{ display:none; }
@@ -143,6 +144,30 @@ const FINISHES = [
   { name:"Chrome", metalness:.9,  roughness:.08, clearcoat:1,   clearcoatRoughness:.05 },
 ];
 
+// Real completed-job photos go here. Drop files into the gallery/ folder next to this page,
+// named gallery/1.jpg .. gallery/4.jpg (or update the "img" paths below), and they replace the
+// placeholder tiles automatically on next reload - no other code changes needed.
+const GALLERY_ITEMS = [
+  { img:"gallery/1.jpg", grad:"linear-gradient(135deg,#16a34a,#052e1a)", label:"Matte Wrap", sub:"Sedan" },
+  { img:"gallery/2.jpg", grad:"linear-gradient(135deg,#374151,#0b0f14)", label:"20% Tint",   sub:"SUV" },
+  { img:"gallery/3.jpg", grad:"linear-gradient(135deg,#22c55e,#052e1a)", label:"Gloss PPF",   sub:"Bonnet" },
+  { img:"gallery/4.jpg", grad:"linear-gradient(135deg,#52525b,#0b0f14)", label:"Chrome Delete", sub:"Pickup" },
+];
+function renderGallery(){
+  const grid = document.getElementById('gallery-grid');
+  if(!grid) return;
+  grid.innerHTML = GALLERY_ITEMS.map(function(it){
+    return '<div class="gallery-card" data-img="' + it.img + '" style="background:' + it.grad + '">' +
+      '<span class="tag">' + it.label + '<br><span style="font-weight:400;opacity:.85">' + it.sub + '</span></span></div>';
+  }).join('');
+  // try the real photo; if it 404s, the gradient placeholder set above just stays visible
+  grid.querySelectorAll('.gallery-card').forEach(function(card){
+    const testImg = new Image();
+    testImg.onload = function(){ card.style.backgroundImage = 'url(' + card.dataset.img + ')'; };
+    testImg.src = card.dataset.img;
+  });
+}
+
 const PANELS = {
   about: {
     title: "About Us",
@@ -157,13 +182,7 @@ const PANELS = {
   },
   gallery: {
     title: "Gallery",
-    html: '<p class="sub">Recent Work</p>' +
-      '<div class="gallery-grid">' +
-      '<div class="gallery-card" style="background:linear-gradient(135deg,#16a34a,#052e1a)">Matte Wrap<br><span style="font-weight:400;opacity:.7">Sedan</span></div>' +
-      '<div class="gallery-card" style="background:linear-gradient(135deg,#374151,#0b0f14)">20% Tint<br><span style="font-weight:400;opacity:.7">SUV</span></div>' +
-      '<div class="gallery-card" style="background:linear-gradient(135deg,#22c55e,#052e1a)">Gloss PPF<br><span style="font-weight:400;opacity:.7">Bonnet</span></div>' +
-      '<div class="gallery-card" style="background:linear-gradient(135deg,#52525b,#0b0f14)">Chrome Delete<br><span style="font-weight:400;opacity:.7">Pickup</span></div>' +
-      '</div>'
+    html: '<p class="sub">Recent Work</p><div class="gallery-grid" id="gallery-grid"></div>'
   },
   contact: {
     title: "Contact & Book",
@@ -262,43 +281,79 @@ const CATEGORY_MATERIAL = {
 };
 
 function buildFallbackCar(){
-  bodyMat = new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, metalness:.75, roughness:.28, clearcoat:1, clearcoatRoughness:.12 });
-  glassMat = new THREE.MeshPhysicalMaterial({ color:0x111318, metalness:.2, roughness:.05, transparent:true, opacity:.78 });
-  const trimMat = new THREE.MeshStandardMaterial({ color:0x18181b, metalness:.9, roughness:.35 });
+  // Clean, guaranteed-correct procedural SUV silhouette. Used as the primary car (see call
+  // at the bottom of this block) after the real Audi R8 mesh (Free3D download) turned out to
+  // be missing its mirrored half in the exported .dae (paint/glass bounding boxes only ever
+  // span one side, x >= 0) - a source-asset defect, not a renderer bug. Rather than ship a
+  // half-a-car live on air, this procedural body is deliberately simple, symmetric-by-construction
+  // and unbranded, which also solves the "unbranded SUV" ask without needing a new download.
+  bodyMat = new THREE.MeshPhysicalMaterial({ color:0x1f2226, metalness:.35, roughness:.3, clearcoat:1, clearcoatRoughness:.15, envMapIntensity:1.1 });
+  glassMat = new THREE.MeshPhysicalMaterial({ color:0x1a2229, metalness:.1, roughness:.08, transparent:true, opacity:.72, side:THREE.DoubleSide, envMapIntensity:1.2 });
+  const trimMat = new THREE.MeshStandardMaterial({ color:0x18181b, metalness:.5, roughness:.5 });
+  const claddingMat = new THREE.MeshStandardMaterial({ color:0x0e0e10, metalness:.2, roughness:.7 });
   const lightMat = new THREE.MeshStandardMaterial({ color:0xfff7d6, emissive:0xffe9a8, emissiveIntensity:1.4 });
   const tailMat = new THREE.MeshStandardMaterial({ color:0x7f1d1d, emissive:0xb91c1c, emissiveIntensity:1.1 });
-  const lower = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.62, 1.9), bodyMat);
-  lower.position.y = 0.55; lower.castShadow = true; carGroup.add(lower);
-  const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.62, 1.68), bodyMat);
-  cabin.position.set(-0.15, 1.14, 0); cabin.castShadow = true; carGroup.add(cabin);
-  const glassBand = new THREE.Mesh(new THREE.BoxGeometry(2.56, 0.4, 1.74), glassMat);
-  glassBand.position.set(-0.15, 1.02, 0); carGroup.add(glassBand);
-  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.12, 1.55), bodyMat);
-  roof.position.set(-0.2, 1.5, 0); roof.castShadow = true; carGroup.add(roof);
-  const hood = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.14, 1.8), bodyMat);
-  hood.position.set(1.8, 0.86, 0); carGroup.add(hood);
-  const trunk = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.12, 1.8), bodyMat);
-  trunk.position.set(-2.05, 0.86, 0); carGroup.add(trunk);
-  const bumperF = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 1.95), trimMat);
-  bumperF.position.set(2.28, 0.5, 0); carGroup.add(bumperF);
-  const bumperR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 1.95), trimMat);
-  bumperR.position.set(-2.28, 0.5, 0); carGroup.add(bumperR);
+
+  // main body - SUV proportions: taller ride height, boxier cabin than a sedan
+  const lower = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.85, 2.0), bodyMat);
+  lower.position.y = 0.68; lower.castShadow = true; carGroup.add(lower);
+
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.78, 1.82), bodyMat);
+  cabin.position.set(-0.1, 1.42, 0); cabin.castShadow = true; carGroup.add(cabin);
+
+  const glassBand = new THREE.Mesh(new THREE.BoxGeometry(2.76, 0.46, 1.88), glassMat);
+  glassBand.position.set(-0.1, 1.3, 0); carGroup.add(glassBand);
+
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.1, 1.68), bodyMat);
+  roof.position.set(-0.14, 1.86, 0); roof.castShadow = true; carGroup.add(roof);
+
+  // roof rails - readable SUV cue
+  const railMat = new THREE.MeshStandardMaterial({ color:0x111113, metalness:.7, roughness:.35 });
   [1,-1].forEach(function(s){
-    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.16,0.5), lightMat);
-    hl.position.set(2.33, 0.55, s*0.65); carGroup.add(hl);
-    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.18,0.5), tailMat);
-    tl.position.set(-2.33, 0.6, s*0.65); carGroup.add(tl);
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,1.7,10), railMat);
+    rail.rotation.z = Math.PI/2; rail.position.set(-0.14, 1.94, s*0.72); carGroup.add(rail);
   });
-  const wheelGeo = new THREE.CylinderGeometry(0.46,0.46,0.34,20);
-  const wheelMat = new THREE.MeshStandardMaterial({ color:0x0b0b0b, metalness:.5, roughness:.6 });
-  const hubMat = new THREE.MeshStandardMaterial({ color:0xd4d4d8, metalness:.9, roughness:.25 });
-  [[1.35,0.72],[1.35,-0.72],[-1.35,0.72],[-1.35,-0.72]].forEach(function(pair){
+
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.16, 1.9), bodyMat);
+  hood.position.set(1.85, 1.06, 0); carGroup.add(hood);
+  const trunk = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.14, 1.9), bodyMat);
+  trunk.position.set(-2.15, 1.06, 0); carGroup.add(trunk);
+
+  const bumperF = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.62, 2.05), trimMat);
+  bumperF.position.set(2.35, 0.62, 0); carGroup.add(bumperF);
+  const bumperR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.62, 2.05), trimMat);
+  bumperR.position.set(-2.35, 0.62, 0); carGroup.add(bumperR);
+
+  // lower cladding strip - two-tone SUV design cue, also visually hides the wheel-well seam
+  const claddingL = new THREE.Mesh(new THREE.BoxGeometry(4.56, 0.26, 0.12), claddingMat);
+  claddingL.position.set(0, 0.34, 1.0); carGroup.add(claddingL);
+  const claddingR = claddingL.clone(); claddingR.position.z = -1.0; carGroup.add(claddingR);
+
+  [1,-1].forEach(function(s){
+    const hl = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.2,0.55), lightMat);
+    hl.position.set(2.4, 0.7, s*0.68); carGroup.add(hl);
+    const tl = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.22,0.55), tailMat);
+    tl.position.set(-2.4, 0.75, s*0.68); carGroup.add(tl);
+  });
+
+  const wheelGeo = new THREE.CylinderGeometry(0.52,0.52,0.36,24);
+  const wheelMat = new THREE.MeshStandardMaterial({ color:0x0b0b0b, metalness:.4, roughness:.65 });
+  const hubMat = new THREE.MeshStandardMaterial({ color:0xc8c9cd, metalness:.6, roughness:.35, envMapIntensity:1 });
+  [[1.5,0.82],[1.5,-0.82],[-1.5,0.82],[-1.5,-0.82]].forEach(function(pair){
     const x=pair[0], z=pair[1];
     const wheel = new THREE.Mesh(wheelGeo, wheelMat);
-    wheel.rotation.z = Math.PI/2; wheel.position.set(x, 0.46, z); wheel.castShadow = true; carGroup.add(wheel);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.36,16), hubMat);
-    hub.rotation.z = Math.PI/2; hub.position.set(x, 0.46, z); carGroup.add(hub);
+    wheel.rotation.z = Math.PI/2; wheel.position.set(x, 0.52, z); wheel.castShadow = true; carGroup.add(wheel);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.24,0.38,16), hubMat);
+    hub.rotation.z = Math.PI/2; hub.position.set(x, 0.52, z); carGroup.add(hub);
+    for(let i=0;i<5;i++){
+      const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.05,0.05), hubMat);
+      spoke.rotation.x = (i/5) * Math.PI*2;
+      spoke.rotation.z = Math.PI/2;
+      spoke.position.set(x, 0.52, z);
+      carGroup.add(spoke);
+    }
   });
+
   carGroup.position.y = 0.09;
   platform.add(carGroup);
   carReady = true;
@@ -341,10 +396,10 @@ function loadRealCar(){
   });
 }
 
-loadRealCar().catch(function(err){
-  console.warn('Falling back to stylised car:', err);
-  buildFallbackCar();
-});
+// Using the procedural car directly - see the comment inside buildFallbackCar() for why the
+// real Audi R8 mesh is parked (source .dae is missing its mirrored half). loadRealCar() is left
+// in place, dormant, in case a verified-complete model replaces the current one later.
+buildFallbackCar();
 
 function buildParticles(count){
   const positions = new Float32Array(count*3);
@@ -490,6 +545,7 @@ function openPanel(key){
   } else {
     const p = PANELS[key];
     panelBody.innerHTML = '<h2>' + p.title + '</h2>' + p.html;
+    if(key==='gallery') renderGallery();
   }
   panelEl.classList.add('open');
 }
